@@ -19,12 +19,16 @@
             </list>
         </property>
     </bean>
-
+    <bean id="blockingDQueue" class="java.util.concurrent.LinkedBlockingDeque" />
     <!-- MsgSender Job -->
-    <bean id="msgSender" class="org.avol.spring.quartz.jobs.MsgSenderJob" />
+    <bean id="msgSender" class="org.avol.spring.quartz.jobs.MsgSenderJob">
+        <property name="blockingDeque" ref="blockingDQueue"/>
+    </bean>
 
     <!-- MsgReceiver Job -->
-    <bean id="msgReceiver" class="org.avol.spring.quartz.jobs.MsgReceiverJob" />
+    <bean id="msgReceiver" class="org.avol.spring.quartz.jobs.MsgReceiverJob">
+        <property name="blockingDeque" ref="blockingDQueue"/>
+    </bean>
 
     <!-- JobDetails and Trigger config -->
     <bean id="runMsgSenderJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
