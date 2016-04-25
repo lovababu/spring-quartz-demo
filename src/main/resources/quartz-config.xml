@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+
+    <!-- Quartz job scheduler. -->
+    <bean id="schedulerFactoryBean" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="jobDetails">
+            <list>
+                <ref bean="runMsgSenderJob"/>
+                <ref bean="runMsgReceiverJob"/>
+            </list>
+        </property>
+        <property name="triggers">
+            <list>
+                <ref bean="msgSenderTrigger"/>
+                <ref bean="msgReceiverTrigger"/>
+            </list>
+        </property>
+    </bean>
+
+    <!-- MsgSender Job -->
+    <bean id="msgSender" class="org.avol.spring.quartz.jobs.MsgSenderJob" />
+
+    <!-- MsgReceiver Job -->
+    <bean id="msgReceiver" class="org.avol.spring.quartz.jobs.MsgReceiverJob" />
+
+    <!-- JobDetails and Trigger config -->
+    <bean id="runMsgSenderJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="msgSender" />
+        <property name="targetMethod" value="startJob"/>
+        <!-- true, run job in a concurrent fashion -->
+        <property name="concurrent" value="true" />
+    </bean>
+    <bean id="msgSenderTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="runMsgSenderJob" />
+        <!-- Triggers for every 5seconds -->
+        <property name="cronExpression" value="0/5 * * * * ?" />
+    </bean>
+
+
+    <bean id="runMsgReceiverJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="msgReceiver" />
+        <property name="targetMethod" value="startJob"/>
+        <property name="concurrent" value="false" />
+    </bean>
+    <bean id="msgReceiverTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="runMsgReceiverJob" />
+        <!-- Triggers for every 5seconds -->
+        <property name="cronExpression" value="0/5 * * * * ?" />
+    </bean>
+</beans>
